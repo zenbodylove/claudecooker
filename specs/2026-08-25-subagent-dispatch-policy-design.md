@@ -86,3 +86,14 @@ About 20 lines:
 ## 9. Out of scope (follow-ups)
 
 Repo-level copies so Teddy inherits the roles; a Sonnet tier; blocking mode for the hook; per-role cost telemetry.
+
+## 10. Acceptance log
+
+**2026-08-25 (build session)**
+- Hook unit tests: 4/4 pass (`hooks/test-dispatch-guard.sh`).
+- Hook live: an `Agent` dispatch with no `subagent_type` received the roster nudge as `additionalContext`. Works without restart.
+- Workflows: all three pass `node --check`.
+- Roles: `Agent(subagent_type: "scout")` returned "not found" — `~/.claude/agents/` did not exist at session start, so roles load on the next Claude Code restart (documented behaviour).
+- Fable effort medium: set in `settings.json`; takes effect on restart.
+
+**Pending, next session:** dispatch `scout` and `skeptic` once each and check the return contract; run `/review-branch` with `{base: "dev"}` on `mastermindmusic` `feature/desktop-closed-beta`; confirm `/model` shows Fable · medium.
