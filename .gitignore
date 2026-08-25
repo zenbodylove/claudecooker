@@ -1,0 +1,15 @@
+# ~/.claude — track policy only
+*
+!.gitignore
+!CLAUDE.md
+!settings.json
+!agents/
+!agents/**
+!workflows/
+!workflows/**
+!hooks/
+!hooks/**
+!specs/
+!specs/**
+!plans/
+!plans/**
