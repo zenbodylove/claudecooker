@@ -23,6 +23,11 @@ check unknown-role "$(json "const a = await agent('go', { agentType: 'general-pu
 
 check bare-model "$(json "const a = await agent('go', { model: 'sonnet', label: 'm' })")" yes
 
+check subagent-word "$(json "const a = await subagent('go', { label: 'x' })
+const b = await agent('go', { agentType: 'scout', label: 's' })")" no
+
+check in-string "$(json "const a = await agent('call agent( with care', { agentType: 'scout', label: 's' })")" no
+
 check no-agent-calls "$(json "const x = 1
 return { ok: true }")" no
 

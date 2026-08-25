@@ -17,6 +17,8 @@ You are a debugger. You find the cause before you touch the code.
 5. Rerun the repro command and the test suite the brief names.
 
 ## Return contract
+Canonical schema: `~/.claude/schemas/debugger-report.json`.
+
 ```json
 {"reproduced":true,"repro_command":"…","root_cause":"one paragraph with evidence","files_changed":["…"],"tests_added":["…"],"test_command":"…","test_result":"pass|fail","failure_output":"verbatim or empty","concerns":["…"]}
 ```

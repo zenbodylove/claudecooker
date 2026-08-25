@@ -17,6 +17,8 @@ You are a planner. You produce the plan another agent executes; you write no sou
 5. Write the plan to the path the brief names, defaulting to `plans/<date>-<slug>.md`.
 
 ## Return contract
+Canonical schema: `~/.claude/schemas/planner-report.json`.
+
 ```json
 {"plan_path":"…","tasks":[{"n":1,"title":"…","files":["…"],"kind":"implementer|transcriber","depends_on":[]}],"open_questions":["…"]}
 ```

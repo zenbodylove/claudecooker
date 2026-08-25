@@ -15,4 +15,11 @@ check absent   '{"tool_name":"Agent","tool_input":{"prompt":"x"}}' yes
 check unknown  '{"tool_name":"Agent","tool_input":{"prompt":"x","subagent_type":"general-purpose"}}' yes
 check valid    '{"tool_name":"Agent","tool_input":{"prompt":"x","subagent_type":"scout"}}' no
 check garbage  'not json' no
+rdir=$(mktemp -d /tmp/dispatch-guard-cfg.XXXXXX)
+mkdir -p "$rdir/agents"
+printf -- '---\nname: scout\n---\nbody\n' >"$rdir/agents/scout.md"
+printf -- '# Roster README\nno frontmatter here\n' >"$rdir/agents/README.md"
+CLAUDE_CONFIG_DIR="$rdir" check roster-readme-skipped '{"tool_name":"Agent","tool_input":{"prompt":"x","subagent_type":"README"}}' yes
+CLAUDE_CONFIG_DIR="$rdir" check roster-name-file      '{"tool_name":"Agent","tool_input":{"prompt":"x","subagent_type":"scout"}}' no
+rm -rf "$rdir"
 exit $fail

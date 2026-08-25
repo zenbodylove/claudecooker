@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "debugger-report",
+  "type": "object",
+  "required": ["reproduced", "repro_command", "root_cause", "files_changed", "tests_added", "test_command", "test_result", "failure_output"],
+  "properties": {
+    "reproduced": { "type": "boolean" },
+    "repro_command": { "type": "string" },
+    "root_cause": { "type": "string" },
+    "files_changed": { "type": "array", "items": { "type": "string" } },
+    "tests_added": { "type": "array", "items": { "type": "string" } },
+    "test_command": { "type": "string" },
+    "test_result": { "type": "string", "enum": ["pass", "fail"] },
+    "failure_output": { "type": "string" },
+    "concerns": { "type": "array", "items": { "type": "string" } }
+  }
+}
