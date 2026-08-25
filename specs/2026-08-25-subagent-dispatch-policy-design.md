@@ -74,7 +74,7 @@ About 20 lines:
 
 ## 7. Versioning
 
-`~/.claude/` becomes a git repo tracking only: `CLAUDE.md`, `agents/`, `workflows/`, `hooks/`, `specs/`, `settings.json`, `.gitignore`. Everything else (sessions, cache, history, projects, plugins, backups, debug, downloads, file-history, paste-cache, session-env, shell-snapshots, `*.jsonl`) is ignored. No remote for now.
+`~/.claude/` is a git repo (remote: https://github.com/zenbodylove/claude, private, branch `main`) tracking only: `CLAUDE.md`, `agents/`, `workflows/`, `hooks/`, `specs/`, `settings.json`, `.gitignore`. Everything else (sessions, cache, history, projects, plugins, backups, debug, downloads, file-history, paste-cache, session-env, shell-snapshots, `*.jsonl`) is ignored.
 
 ## 8. Testing
 
