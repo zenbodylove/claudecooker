@@ -10,6 +10,7 @@ export const meta = {
 
 const base = (args && args.base) || 'dev'
 
+// canonical: schemas/reviewer-findings.json — keep in sync (hooks/test-schemas.sh)
 const FINDINGS = {
   type: 'object',
   required: ['verdict', 'findings'],
@@ -30,6 +31,8 @@ const FINDINGS = {
     notes: { type: 'array', items: { type: 'string' } },
   },
 }
+
+// canonical: schemas/skeptic-verdict.json — keep in sync (hooks/test-schemas.sh)
 const VERDICT = {
   type: 'object',
   required: ['claim', 'refuted', 'confidence', 'reasoning'],

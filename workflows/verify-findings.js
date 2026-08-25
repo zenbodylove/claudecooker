@@ -5,6 +5,7 @@ export const meta = {
   phases: [{ title: 'Verify', detail: 'one skeptic per finding' }],
 }
 
+// canonical: schemas/skeptic-verdict.json — keep in sync (hooks/test-schemas.sh)
 const VERDICT = {
   type: 'object',
   required: ['claim', 'refuted', 'confidence', 'reasoning'],

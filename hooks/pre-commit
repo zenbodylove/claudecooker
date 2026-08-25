@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# git pre-commit: run the repo's hook tests and workflow syntax checks.
+# Install once per clone: git config core.hooksPath hooks
+# Runs hooks/run-tests.sh; see that file for what is checked.
+set -u
+exec "$(dirname "$0")/run-tests.sh"

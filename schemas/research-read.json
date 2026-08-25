@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "research-read",
+  "type": "object",
+  "required": ["path", "summary", "relevant"],
+  "properties": {
+    "path": { "type": "string" },
+    "summary": { "type": "string" },
+    "relevant": { "type": "boolean" },
+    "key_lines": { "type": "array", "items": { "type": "string" } }
+  }
+}

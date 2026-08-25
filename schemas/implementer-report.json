@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "implementer-report",
+  "type": "object",
+  "required": ["files_changed", "tests_added", "test_command", "test_result", "failure_output", "assumptions", "concerns"],
+  "properties": {
+    "files_changed": { "type": "array", "items": { "type": "string" } },
+    "tests_added": { "type": "array", "items": { "type": "string" } },
+    "test_command": { "type": "string" },
+    "test_result": { "type": "string", "enum": ["pass", "fail"] },
+    "failure_output": { "type": "string" },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "concerns": { "type": "array", "items": { "type": "string" } }
+  }
+}

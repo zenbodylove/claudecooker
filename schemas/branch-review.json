@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "branch-review",
+  "type": "object",
+  "required": ["verdict", "blocking", "non_blocking", "tests", "summary"],
+  "properties": {
+    "verdict": { "type": "string", "enum": ["ready", "not_ready"] },
+    "blocking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "line", "claim", "evidence"],
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "claim": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "non_blocking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "line", "claim", "evidence"],
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "claim": { "type": "string" },
+          "evidence": { "type": "string" }
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "required": ["command", "result", "output_tail"],
+      "properties": {
+        "command": { "type": "string" },
+        "result": { "type": "string", "enum": ["pass", "fail"] },
+        "output_tail": { "type": "string" }
+      }
+    },
+    "summary": { "type": "string" }
+  }
+}

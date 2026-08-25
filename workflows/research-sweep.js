@@ -18,6 +18,7 @@ const angles = (args && args.angles) || [
   'by tests, docs and comments that describe the topic',
 ]
 
+// canonical: schemas/scout-matches.json — keep in sync (hooks/test-schemas.sh)
 const MATCHES = {
   type: 'object', required: ['matches'],
   properties: {
@@ -25,10 +26,14 @@ const MATCHES = {
     notes: { type: 'array', items: { type: 'string' } },
   },
 }
+
+// canonical: schemas/research-read.json — keep in sync (hooks/test-schemas.sh)
 const READ = {
   type: 'object', required: ['path', 'summary', 'relevant'],
   properties: { path: { type: 'string' }, summary: { type: 'string' }, relevant: { type: 'boolean' }, key_lines: { type: 'array', items: { type: 'string' } } },
 }
+
+// canonical: schemas/research-map.json — keep in sync (hooks/test-schemas.sh)
 const MAP = {
   type: 'object', required: ['answer', 'locations', 'open_questions'],
   properties: {

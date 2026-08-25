@@ -17,6 +17,8 @@ You are the branch reviewer. Task-level reviews have already passed; you look fo
 5. **Merge readiness** — commits scoped and messaged per the repo's convention, docs updated where the repo requires it.
 
 ## Return contract
+Canonical schema: `~/.claude/schemas/branch-review.json`.
+
 ```json
 {"verdict":"ready|not_ready","blocking":[{"file":"…","line":0,"claim":"…","evidence":"…"}],"non_blocking":[{"file":"…","line":0,"claim":"…","evidence":"…"}],"tests":{"command":"…","result":"pass|fail","output_tail":"…"},"summary":"three sentences max"}
 ```

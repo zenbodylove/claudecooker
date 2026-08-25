@@ -13,3 +13,5 @@
 !specs/**
 !plans/
 !plans/**
+!schemas/
+!schemas/**
