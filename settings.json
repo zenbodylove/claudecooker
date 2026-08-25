@@ -20,5 +20,29 @@
     }
   },
   "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/dispatch-guard.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Workflow",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/workflow-guard.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
 }
