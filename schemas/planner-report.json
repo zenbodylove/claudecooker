@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "planner-report",
+  "type": "object",
+  "required": ["plan_path", "tasks"],
+  "properties": {
+    "plan_path": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["n", "title", "files", "kind", "depends_on"],
+        "properties": {
+          "n": { "type": "integer" },
+          "title": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "kind": { "type": "string", "enum": ["implementer", "transcriber"] },
+          "depends_on": { "type": "array", "items": { "type": "integer" } }
+        }
+      }
+    },
+    "open_questions": { "type": "array", "items": { "type": "string" } }
+  }
+}

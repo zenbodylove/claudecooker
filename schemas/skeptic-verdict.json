@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "skeptic-verdict",
+  "type": "object",
+  "required": ["claim", "refuted", "confidence", "reasoning"],
+  "properties": {
+    "claim": { "type": "string" },
+    "refuted": { "type": "boolean" },
+    "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+    "reasoning": { "type": "string" },
+    "evidence": { "type": "array", "items": { "type": "string" } }
+  }
+}
