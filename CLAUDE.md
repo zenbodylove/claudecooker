@@ -63,16 +63,16 @@ Modes vary the roster and the workflow fan-out with how much budget is left. The
 |---|---|---|---|
 | `scout` | Haiku · medium | Haiku · medium | Haiku · medium |
 | `transcriber` | Haiku · medium | Haiku · medium | Haiku · medium |
-| `planner` | Opus · high | Opus · high | Opus · high |
-| `debugger` | Opus · high | Opus · high | Opus · high |
+| `planner` | Opus · high | Opus · high | Opus · medium |
+| `debugger` | Opus · high | Opus · high | Opus · medium |
 | `implementer` | Opus · high | Opus · medium | Opus · medium |
 | `reviewer` | Opus · high | Opus · medium | Sonnet · high |
 | `skeptic` | Opus · medium | Sonnet · high | Sonnet · high |
 | `docs-writer` | Opus · medium | Sonnet · medium | Sonnet · medium |
-| `branch-reviewer` | Opus · xhigh | Opus · high | Opus · high |
+| `branch-reviewer` | Opus · xhigh | Opus · high | Opus · medium |
 | *workflow fan-out* | full | full | capped |
 
-1. **Substitute from the table, never from memory.** In a non-default mode, dispatch the twin `modes.json` names: `implementer-medium`, `reviewer-medium`, `reviewer-sonnet`, `skeptic-sonnet`, `docs-writer-sonnet`, `branch-reviewer-high`. Twins are named by tier, not by mode. `scout`, `transcriber`, `planner` and `debugger` never substitute — a bad plan costs more rework than the saving, and a debugger is dispatched only when something is already wrong.
+1. **Substitute from the table, never from memory.** In a non-default mode, dispatch the twin `modes.json` names: `implementer-medium`, `reviewer-medium`, `reviewer-sonnet`, `skeptic-sonnet`, `docs-writer-sonnet`, `planner-medium`, `debugger-medium`, `branch-reviewer-medium`, `branch-reviewer-high`. Twins are named by tier, not by mode. Only `scout` and `transcriber` never substitute — they are Haiku already. `planner` and `debugger` hold their full tier in `flow`, because a bad plan costs more rework than the saving and a debugger is dispatched only when something is already wrong; in `chill` the whole roster sits on the cheaper side of the budget, planning and debugging included, because the point of `chill` is to survive the window.
 2. **Pass the mode to every `Workflow` call.** Workflow scripts have no filesystem access; `args.mode` is the only way they learn it, and a workflow called without it runs at cook tiers.
 3. **Capped fan-out** (`chill` only): `review-branch` skeptic-verifies only `critical` and `important` findings and returns `minor` ones in `unverified`; `research-sweep` deep-reads at most 4 survivors and reports how many it skipped. `verify-findings` is never capped — the caller already chose its list.
 4. **Orchestrator discipline.** In `flow` and `chill` the orchestrator keeps its own context small, preferring a `scout` dispatch over pulling large files into the session itself. The orchestrator is Fable, and its own reads are billed at the session tier however cheap its subagents are.

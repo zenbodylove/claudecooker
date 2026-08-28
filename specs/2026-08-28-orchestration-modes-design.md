@@ -201,3 +201,14 @@ Hook tests already run against a temporary `CLAUDE_CONFIG_DIR`, so mode cases se
 - **No automatic switching.** Modes are set by hand via `/mode`. Scraping usage data to switch on
   thresholds needs a data source whose existence and stability are unverified; not built.
 - **Mode is machine state, not repo state.** It is deliberately invisible to git.
+
+## Amendment — 2026-08-28: chill drops the last Opus · high roles
+
+The tables above are the design as first built and are left as written. One cell group has since
+changed: in `chill`, every role that ran at **Opus · high** now runs at **Opus · medium**. That is
+`planner`, `debugger` and `branch-reviewer` (whose chill twin moves from `branch-reviewer-high` to the
+new `branch-reviewer-medium`); `planner` and `debugger` gain twins of their own, `planner-medium` and
+`debugger-medium`. `cook` and `flow` are unchanged, and no role changes model — only effort.
+
+The reasoning: in `chill` the point is to survive the window, and a planner or debugger dispatch is not
+exempt from that. §2's "`planner` and `debugger` never vary" now holds for `flow` only.

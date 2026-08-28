@@ -88,9 +88,10 @@ access, so anything they need to know arrives in `args`.
 Adding a file to `agents/` extends the roster automatically: both guards derive it from the basenames of
 `agents/*.md` that contain a `name:` line, so no hook needs editing.
 
-Alongside these nine there are six **tier twins** — `implementer-medium`, `reviewer-medium`,
-`reviewer-sonnet`, `skeptic-sonnet`, `docs-writer-sonnet`, `branch-reviewer-high`. Each is a full copy of
-its parent at a cheaper tier, and modes are what select them.
+Alongside these nine there are nine **tier twins** — `implementer-medium`, `reviewer-medium`,
+`reviewer-sonnet`, `skeptic-sonnet`, `docs-writer-sonnet`, `planner-medium`, `debugger-medium`,
+`branch-reviewer-high`, `branch-reviewer-medium`. Each is a full copy of its parent at a cheaper tier, and
+modes are what select them.
 
 ## Modes: cook, flow, chill
 
@@ -109,14 +110,16 @@ roster shifts under you.
 - **`flow`** is the everyday middle. The shape of the work is unchanged — full skeptic coverage, uncapped
   workflows — but the agents doing it are a notch cheaper.
 - **Chill out if you're nearing the end** of a session or a weekly window and want the week to survive.
-  `chill` is `flow` plus a narrower fan-out.
+  `chill` is `flow` plus a narrower fan-out, plus the last three holdouts: nothing runs at Opus · high any
+  more, so `planner`, `debugger` and `branch-reviewer` drop to Opus · medium too.
 
 Two levers, and they are worth understanding separately:
 
 1. **Tier.** Judgement work moves off Opus where being wrong is cheap to recover from. Where a role drops
    from Opus to Sonnet its effort is *raised* — `reviewer` becomes Sonnet · **high**, not Sonnet · medium.
    Effort buys thinking tokens rather than a heavier model, so Sonnet · high protects the weekly cap while
-   recovering most of the judgement quality.
+   recovering most of the judgement quality. In `chill` the tier lever is pulled all the way: no role runs
+   above Opus · medium, planning and debugging included.
 2. **Fan-out**, in `chill` only. The workflow shapes that spawn one agent per finding stop spawning
    unboundedly: `review-branch` skeptic-verifies only `critical` and `important` findings and returns the
    `minor` ones in a separate `unverified` array, and its result carries `mode` so a cheap review can never
@@ -128,19 +131,20 @@ Two levers, and they are worth understanding separately:
 |---|---|---|---|
 | `scout` | Haiku · medium | Haiku · medium | Haiku · medium |
 | `transcriber` | Haiku · medium | Haiku · medium | Haiku · medium |
-| `planner` | Opus · high | Opus · high | Opus · high |
-| `debugger` | Opus · high | Opus · high | Opus · high |
+| `planner` | Opus · high | Opus · high | Opus · medium |
+| `debugger` | Opus · high | Opus · high | Opus · medium |
 | `implementer` | Opus · high | Opus · medium | Opus · medium |
 | `reviewer` | Opus · high | Opus · medium | Sonnet · high |
 | `skeptic` | Opus · medium | Sonnet · high | Sonnet · high |
 | `docs-writer` | Opus · medium | Sonnet · medium | Sonnet · medium |
-| `branch-reviewer` | Opus · xhigh | Opus · high | Opus · high |
+| `branch-reviewer` | Opus · xhigh | Opus · high | Opus · medium |
 | *workflow fan-out* | full | full | capped |
 
-`planner` and `debugger` never vary: a bad plan costs more rework than the saving, and a debugger is
-dispatched only when something is already wrong. `scout` and `transcriber` are Haiku already.
-`implementer` goes the other way in `cook` — Opus · high, because its mistakes cost an Opus review round
-plus an Opus fix round.
+`planner` and `debugger` hold their full tier through `flow`: a bad plan costs more rework than the saving,
+and a debugger is dispatched only when something is already wrong. They give it up in `chill`, where the
+point is to survive the window and no dispatch is exempt from that. Only `scout` and `transcriber` never
+vary — they are Haiku already. `implementer` goes the other way in `cook` — Opus · high, because its
+mistakes cost an Opus review round plus an Opus fix round.
 
 Switch with the slash command:
 
@@ -156,8 +160,8 @@ untracked by design: it is machine state, not repo state, and the two checkouts 
 
 `modes.json` at the repo root is the substitution table — the single source of truth for which twin
 replaces which role in which mode, and whether fan-out is `full` or `capped`. Twins are named by tier
-(`reviewer-sonnet`), not by mode (`reviewer-chill`), because `flow` and `chill` share four of their five
-substitutions.
+(`reviewer-sonnet`), not by mode (`reviewer-chill`), because `flow` and `chill` share three substitutions
+outright — `implementer-medium`, `skeptic-sonnet` and `docs-writer-sonnet`.
 
 ## Guards: they nudge, they never block
 
@@ -229,7 +233,7 @@ column 0, with the marker comment on the line directly above. Reindent one and t
 4. If the role should vary by mode, follow "Adding a mode" step 2 for its twin, add its substitutions to
    `modes.json`, add a row to the tier table in `CLAUDE.md` §Modes and to the one in this README, and add a
    row to the `TIERS` block in `hooks/test-modes.sh` so every cell is asserted. If it should never vary —
-   like `planner` and `debugger` — add the `TIERS` row anyway, with the same tier in all three columns.
+   like `scout` and `transcriber` — add the `TIERS` row anyway, with the same tier in all three columns.
 5. Run `bash hooks/run-tests.sh`.
 6. Land the change in `~/.claude`. Roles are loaded when a session starts, so a role added mid-session is
    not dispatchable until Claude Code restarts.

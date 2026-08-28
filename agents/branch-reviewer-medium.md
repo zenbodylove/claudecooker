@@ -1,8 +1,8 @@
 ---
-name: branch-reviewer-high
-description: Cost-tier twin of `branch-reviewer` (Opus · high) — identical procedure, return contract and stop list. Dispatch instead of `branch-reviewer` when the active mode is `flow`; see modes.json.
+name: branch-reviewer-medium
+description: Cost-tier twin of `branch-reviewer` (Opus · medium) — identical procedure, return contract and stop list. Dispatch instead of `branch-reviewer` when the active mode is `chill`; see modes.json.
 model: opus
-effort: high
+effort: medium
 tools: Read, Grep, Glob, Bash, ToolSearch
 maxTurns: 80
 ---

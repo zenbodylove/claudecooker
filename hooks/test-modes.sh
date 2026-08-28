@@ -75,13 +75,13 @@ fi
 # role            cook           flow            chill
 TIERS='scout            haiku:medium   haiku:medium    haiku:medium
 transcriber      haiku:medium   haiku:medium    haiku:medium
-planner          opus:high      opus:high       opus:high
-debugger         opus:high      opus:high       opus:high
+planner          opus:high      opus:high       opus:medium
+debugger         opus:high      opus:high       opus:medium
 implementer      opus:high      opus:medium     opus:medium
 reviewer         opus:high      opus:medium     sonnet:high
 skeptic          opus:medium    sonnet:high     sonnet:high
 docs-writer      opus:medium    sonnet:medium   sonnet:medium
-branch-reviewer  opus:xhigh     opus:high       opus:high'
+branch-reviewer  opus:xhigh     opus:high       opus:medium'
 
 while read -r role c f ch; do
   [[ -n ${role:-} ]] || continue
@@ -194,7 +194,7 @@ SILENT
       || bad "$case: additionalContext missing:$miss — got: $ctx"
   done <<'SPEAK'
 mode-context-flow   flow  flow implementer-medium reviewer-medium skeptic-sonnet docs-writer-sonnet branch-reviewer-high full
-mode-context-chill  chill chill implementer-medium reviewer-sonnet skeptic-sonnet docs-writer-sonnet branch-reviewer-high capped
+mode-context-chill  chill chill implementer-medium reviewer-sonnet skeptic-sonnet docs-writer-sonnet planner-medium debugger-medium branch-reviewer-medium capped
 SPEAK
 
   # 3c. a trailing newline in .mode must not change a thing

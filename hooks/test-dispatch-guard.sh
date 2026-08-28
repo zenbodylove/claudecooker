@@ -36,13 +36,15 @@ CLAUDE_CONFIG_DIR="$mdir" check mode-flow-implementer     '{"tool_name":"Agent",
 CLAUDE_CONFIG_DIR="$mdir" check mode-flow-reviewer        '{"tool_name":"Agent","tool_input":{"subagent_type":"reviewer"}}' yes
 CLAUDE_CONFIG_DIR="$mdir" check mode-flow-scout           '{"tool_name":"Agent","tool_input":{"subagent_type":"scout"}}' no
 CLAUDE_CONFIG_DIR="$mdir" check mode-flow-planner         '{"tool_name":"Agent","tool_input":{"subagent_type":"planner"}}' no
+CLAUDE_CONFIG_DIR="$mdir" check mode-flow-debugger        '{"tool_name":"Agent","tool_input":{"subagent_type":"debugger"}}' no
 CLAUDE_CONFIG_DIR="$mdir" check mode-flow-twin-named      '{"tool_name":"Agent","tool_input":{"subagent_type":"reviewer-medium"}}' no
 
 setmode chill
 CLAUDE_CONFIG_DIR="$mdir" check mode-chill-reviewer       '{"tool_name":"Agent","tool_input":{"subagent_type":"reviewer"}}' yes
 CLAUDE_CONFIG_DIR="$mdir" check mode-chill-branch-reviewer '{"tool_name":"Agent","tool_input":{"subagent_type":"branch-reviewer"}}' yes
 CLAUDE_CONFIG_DIR="$mdir" check mode-chill-scout          '{"tool_name":"Agent","tool_input":{"subagent_type":"scout"}}' no
-CLAUDE_CONFIG_DIR="$mdir" check mode-chill-planner        '{"tool_name":"Agent","tool_input":{"subagent_type":"planner"}}' no
+CLAUDE_CONFIG_DIR="$mdir" check mode-chill-planner        '{"tool_name":"Agent","tool_input":{"subagent_type":"planner"}}' yes
+CLAUDE_CONFIG_DIR="$mdir" check mode-chill-debugger       '{"tool_name":"Agent","tool_input":{"subagent_type":"debugger"}}' yes
 
 printf 'chill\n' >"$mdir/.mode"
 CLAUDE_CONFIG_DIR="$mdir" check mode-chill-trailing-nl    '{"tool_name":"Agent","tool_input":{"subagent_type":"reviewer"}}' yes
