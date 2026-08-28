@@ -10,6 +10,35 @@ export const meta = {
 
 const base = (args && args.base) || 'dev'
 
+const mode = (args && args.mode) || 'cook'
+
+// canonical: modes.json — keep in sync (hooks/test-modes.sh)
+const SUBS = {
+  cook: { roles: {}, fanout: 'full' },
+  flow: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-medium',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'full',
+  },
+  chill: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-sonnet',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'capped',
+  },
+}
+const role = r => (SUBS[mode] && SUBS[mode].roles && SUBS[mode].roles[r]) || r
+const fanout = (SUBS[mode] && SUBS[mode].fanout) || 'full'
+
 // canonical: schemas/reviewer-findings.json — keep in sync (hooks/test-schemas.sh)
 const FINDINGS = {
   type: 'object',
@@ -56,7 +85,7 @@ const reviews = await parallel(DIMENSIONS.map(d => () =>
     `Review the diff \`git diff ${base}...HEAD\` (run it yourself; also read \`git log ${base}..HEAD --oneline\`).\n` +
       `Dimension: ${d.key} — look only for: ${d.prompt}.\n` +
       `Quote evidence for every finding. Return the findings shape.`,
-    { agentType: 'reviewer', label: `review:${d.key}`, phase: 'Review', schema: FINDINGS },
+    { agentType: role('reviewer'), label: `review:${d.key}`, phase: 'Review', schema: FINDINGS },
   ).then(r => r && { ...r, dimension: d.key }),
 ))
 
@@ -79,7 +108,7 @@ const verified = await pipeline(all, f =>
   agent(
     `Claim to test: ${f.claim}\nLocation: ${f.file}:${f.line}\nEvidence offered: ${f.evidence}\n` +
       `The diff under review is \`git diff ${base}...HEAD\`. Try to refute this claim. Return the verdict shape.`,
-    { agentType: 'skeptic', label: `skeptic:${f.file}:${f.line}`, phase: 'Verify', schema: VERDICT },
+    { agentType: role('skeptic'), label: `skeptic:${f.file}:${f.line}`, phase: 'Verify', schema: VERDICT },
   ).then(v => ({ ...f, verdict: v })),
 )
 

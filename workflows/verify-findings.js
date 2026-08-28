@@ -5,6 +5,34 @@ export const meta = {
   phases: [{ title: 'Verify', detail: 'one skeptic per finding' }],
 }
 
+const mode = (args && args.mode) || 'cook'
+
+// canonical: modes.json — keep in sync (hooks/test-modes.sh)
+const SUBS = {
+  cook: { roles: {}, fanout: 'full' },
+  flow: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-medium',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'full',
+  },
+  chill: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-sonnet',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'capped',
+  },
+}
+const role = r => (SUBS[mode] && SUBS[mode].roles && SUBS[mode].roles[r]) || r
+
 // canonical: schemas/skeptic-verdict.json — keep in sync (hooks/test-schemas.sh)
 const VERDICT = {
   type: 'object',
@@ -26,7 +54,7 @@ const results = await pipeline(findings, (f, _, i) =>
   agent(
     `Claim to test: ${f.claim}\nLocation: ${f.file}${f.line ? ':' + f.line : ''}\n` +
       `Try to refute this claim with evidence from the code. Return the verdict shape.`,
-    { agentType: 'skeptic', label: `skeptic:${f.file}`, phase: 'Verify', schema: VERDICT },
+    { agentType: role('skeptic'), label: `skeptic:${f.file}`, phase: 'Verify', schema: VERDICT },
   ).then(v => ({ ...f, verdict: v })),
 )
 

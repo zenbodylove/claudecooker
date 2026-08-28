@@ -18,6 +18,35 @@ const angles = (args && args.angles) || [
   'by tests, docs and comments that describe the topic',
 ]
 
+const mode = (args && args.mode) || 'cook'
+
+// canonical: modes.json — keep in sync (hooks/test-modes.sh)
+const SUBS = {
+  cook: { roles: {}, fanout: 'full' },
+  flow: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-medium',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'full',
+  },
+  chill: {
+    roles: {
+      implementer: 'implementer-medium',
+      reviewer: 'reviewer-sonnet',
+      skeptic: 'skeptic-sonnet',
+      'docs-writer': 'docs-writer-sonnet',
+      'branch-reviewer': 'branch-reviewer-high',
+    },
+    fanout: 'capped',
+  },
+}
+const role = r => (SUBS[mode] && SUBS[mode].roles && SUBS[mode].roles[r]) || r
+const fanout = (SUBS[mode] && SUBS[mode].fanout) || 'full'
+
 // canonical: schemas/scout-matches.json — keep in sync (hooks/test-schemas.sh)
 const MATCHES = {
   type: 'object', required: ['matches'],
@@ -46,7 +75,7 @@ const MAP = {
 phase('Sweep')
 const sweeps = await parallel(angles.map((a, i) => () =>
   agent(`Question: ${question}\nSearch angle: ${a}.\nReturn up to 12 matches with one-line reasons.`,
-    { agentType: 'scout', label: `scout:${i + 1}`, phase: 'Sweep', schema: MATCHES }),
+    { agentType: role('scout'), label: `scout:${i + 1}`, phase: 'Sweep', schema: MATCHES }),
 ))
 const byPath = new Map()
 for (const s of sweeps.filter(Boolean)) for (const m of s.matches || []) if (!byPath.has(m.path)) byPath.set(m.path, m)
@@ -56,7 +85,7 @@ log(`${unique.length} unique locations from ${angles.length} angles${byPath.size
 phase('Read')
 const reads = await pipeline(unique, m =>
   agent(`Question: ${question}\nRead ${m.path} in full (it was flagged because: ${m.why}). Do not edit anything.\nSummarise what it contributes to the question and whether it is actually relevant.`,
-    { agentType: 'implementer', label: `read:${m.path}`, phase: 'Read', schema: READ }),
+    { agentType: role('implementer'), label: `read:${m.path}`, phase: 'Read', schema: READ }),
 )
 const relevant = reads.filter(Boolean).filter(r => r.relevant)
 
@@ -64,6 +93,6 @@ phase('Synthesise')
 const map = await agent(
   `Question: ${question}\nHere are per-file summaries from a read pass:\n${JSON.stringify(relevant, null, 2)}\n` +
     `Produce one structured answer: the answer in plain prose, the locations with each file's role, and open questions you could not settle from these summaries.`,
-  { agentType: 'reviewer', label: 'synthesise', phase: 'Synthesise', schema: MAP },
+  { agentType: role('reviewer'), label: 'synthesise', phase: 'Synthesise', schema: MAP },
 )
 return map

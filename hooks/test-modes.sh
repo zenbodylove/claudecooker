@@ -250,4 +250,57 @@ else
     || bad "settings.json: PreToolUse hooks disturbed"
 fi
 
+# ---------------------------------------------------------------------------
+# 4. inline SUBS in workflows/*.js still deep-matches modes.json .modes
+# ---------------------------------------------------------------------------
+node -e "$(cat <<'JS'
+const fs = require('fs'), path = require('path')
+const root = process.argv[1]
+const MARK = /^\s*\/\/ canonical: modes\.json — keep in sync \(hooks\/test-modes\.sh\)\s*$/
+const sortDeep = v => Array.isArray(v) ? v.map(sortDeep)
+  : (v && typeof v === 'object')
+    ? Object.fromEntries(Object.keys(v).sort().map(k => [k, sortDeep(v[k])]))
+    : v
+const norm = v => JSON.stringify(sortDeep(v))
+let fail = 0
+const ok = m => console.log('ok   ' + m)
+const bad = m => { console.log('FAIL ' + m); fail = 1 }
+let canon
+try { canon = JSON.parse(fs.readFileSync(path.join(root, 'modes.json'), 'utf8')).modes }
+catch (e) { bad('modes.json: not readable/valid JSON: ' + e.message); process.exit(1) }
+const wfDir = path.join(root, 'workflows')
+const files = fs.existsSync(wfDir) ? fs.readdirSync(wfDir).filter(f => f.endsWith('.js')) : []
+if (!files.length) bad('workflows/: no .js files found')
+for (const f of files) {
+  const src = fs.readFileSync(path.join(wfDir, f), 'utf8')
+  if (!/\bagent\(/.test(src)) { ok(`workflows/${f}: no agent() calls, no SUBS needed`); continue }
+  const lines = src.split('\n')
+  const start = lines.findIndex(l => l === 'const SUBS = {')
+  if (start < 0) { bad(`workflows/${f}: cannot locate 'const SUBS = {' at column 0`); continue }
+  const prev = lines[start - 1] === undefined ? '' : lines[start - 1]
+  if (!MARK.test(prev)) { bad(`workflows/${f}: SUBS has no '// canonical: modes.json — keep in sync (hooks/test-modes.sh)' comment above it`); continue }
+  let end = -1
+  for (let i = start; i < lines.length; i++) if (lines[i] === '}') { end = i; break }
+  if (end < 0) { bad(`workflows/${f}: SUBS literal has no terminating '}' at column 0`); continue }
+  const literal = lines.slice(start, end + 1).join('\n').replace(/^const SUBS = /, '')
+  let inline
+  try { inline = new Function('return ' + literal)() }
+  catch (e) { bad(`workflows/${f}: SUBS literal does not evaluate: ${e.message}`); continue }
+  if (norm(inline) !== norm(canon)) {
+    bad(`workflows/${f}: SUBS drifted from modes.json`)
+    console.log('     inline: ' + norm(inline))
+    console.log('     canon : ' + norm(canon))
+  } else {
+    ok(`workflows/${f}: SUBS == modes.json .modes`)
+  }
+  if (/const role\s*=/.test(src)) ok(`workflows/${f}: defines a role() helper`)
+  else bad(`workflows/${f}: has agent() calls but no 'const role =' helper`)
+  const lits = [...src.matchAll(/agentType:\s*(['"])([^'"]*)\1/g)].map(m => m[2])
+  if (!lits.length) ok(`workflows/${f}: no quoted agentType literals remain`)
+  else bad(`workflows/${f}: quoted agentType literal(s) remain: ${lits.join(', ')}`)
+}
+process.exit(fail)
+JS
+)" "$ROOT" || fail=1
+
 exit $fail
