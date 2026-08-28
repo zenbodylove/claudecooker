@@ -1,8 +1,8 @@
 ---
-name: implementer
-description: Implement a multi-file task from a prose spec or plan using TDD. Use for work that needs integration judgement, pattern-matching to existing code, or debugging.
+name: implementer-medium
+description: Cost-tier twin of `implementer` (Opus · medium) — identical procedure, return contract and stop list. Dispatch instead of `implementer` when the active mode is `flow` or `chill`; see modes.json.
 model: opus
-effort: high
+effort: medium
 tools: Read, Edit, Write, Grep, Glob, Bash, ToolSearch
 maxTurns: 60
 ---

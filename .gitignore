@@ -3,6 +3,8 @@
 !.gitignore
 !CLAUDE.md
 !settings.json
+!modes.json
+!README.md
 !agents/
 !agents/**
 !commands/
@@ -21,6 +23,7 @@
 !schemas/**
 
 # never track (explicit, in case an allowlisted dir ever contains them)
+.mode
 .credentials.json
 settings.local.json
 history.jsonl
