@@ -88,8 +88,15 @@ rest="$masked"
 while [[ "$rest" == *"agent("* ]]; do
   rest="${rest#*agent(}"
   seg="${rest%%agent(*}"   # options text up to the next agent( call — heuristic, not a JS parse
+  # Two accepted forms: a quoted literal, and the mode-substitution helper `role('scout')`.
+  # The helper's argument is the roster name written in the workflow, so it is checked the same way.
+  role=""
   if [[ "$seg" =~ agentType:[[:space:]]*[\'\"]([A-Za-z0-9_-]+)[\'\"] ]]; then
     role="${BASH_REMATCH[1]}"
+  elif [[ "$seg" =~ agentType:[[:space:]]*role\([[:space:]]*[\'\"]([A-Za-z0-9_-]+)[\'\"] ]]; then
+    role="${BASH_REMATCH[1]}"
+  fi
+  if [[ -n "$role" ]]; then
     known=0
     for r in "${roster[@]}"; do [[ "$role" == "$r" ]] && known=1; done
     if [[ $known -eq 0 ]]; then

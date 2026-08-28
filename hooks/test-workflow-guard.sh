@@ -92,9 +92,24 @@ CLAUDE_CONFIG_DIR="$modecfg" check mode-flow-no-args "$(json "$clean")" yes
 
 set_mode cook
 CLAUDE_CONFIG_DIR="$modecfg" check mode-cook-no-args "$(json "$clean")" no
-# Task 7 form: agentType: role('reviewer') must stay silent under the role check.
+# Task 7 form: agentType: role('x') is resolved and validated exactly like a quoted literal —
+# silent because 'reviewer' is on the roster, not because role() is exempt from the check.
 CLAUDE_CONFIG_DIR="$modecfg" check role-helper \
   "$(json "const a = await agent('review it', { agentType: role('reviewer'), phase: 'Review' })")" no
+# The counterpart: an unknown name inside role() must nudge, with the same message shape as the literal form.
+CLAUDE_CONFIG_DIR="$modecfg" check_contains role-helper-unknown \
+  "$(json "const a = await agent('go', { agentType: role('bogus-role'), label: 's' })")" \
+  'unknown role: bogus-role' 'Roster:'
+# Double-quoted and whitespaced variants of the helper call resolve too.
+CLAUDE_CONFIG_DIR="$modecfg" check role-helper-dq \
+  "$(json "const a = await agent('go', { agentType: role( \"scout\" ), label: 's' })")" no
+CLAUDE_CONFIG_DIR="$modecfg" check_contains role-helper-dq-unknown \
+  "$(json "const a = await agent('go', { agentType: role( \"nope-role\" ), label: 's' })")" \
+  'unknown role: nope-role'
+# A quoted literal still works alongside the helper form in the same script.
+CLAUDE_CONFIG_DIR="$modecfg" check_contains role-mixed \
+  "$(json "const a = await agent('go', { agentType: 'scout', label: 's' })
+const b = await agent('go', { agentType: role('nope2'), label: 'b' })")" 'unknown role: nope2'
 
 set_mode ''
 CLAUDE_CONFIG_DIR="$modecfg" check mode-absent-no-args "$(json "$clean")" no

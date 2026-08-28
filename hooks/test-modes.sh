@@ -268,6 +268,10 @@ const bad = m => { console.log('FAIL ' + m); fail = 1 }
 let canon
 try { canon = JSON.parse(fs.readFileSync(path.join(root, 'modes.json'), 'utf8')).modes }
 catch (e) { bad('modes.json: not readable/valid JSON: ' + e.message); process.exit(1) }
+const agentsDir = path.join(root, 'agents')
+const roster = (fs.existsSync(agentsDir) ? fs.readdirSync(agentsDir) : [])
+  .filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, ''))
+if (!roster.length) bad('agents/: no .md roster files found')
 const wfDir = path.join(root, 'workflows')
 const files = fs.existsSync(wfDir) ? fs.readdirSync(wfDir).filter(f => f.endsWith('.js')) : []
 if (!files.length) bad('workflows/: no .js files found')
@@ -298,6 +302,15 @@ for (const f of files) {
   const lits = [...src.matchAll(/agentType:\s*(['"])([^'"]*)\1/g)].map(m => m[2])
   if (!lits.length) ok(`workflows/${f}: no quoted agentType literals remain`)
   else bad(`workflows/${f}: quoted agentType literal(s) remain: ${lits.join(', ')}`)
+  // A role() argument names a roster file. workflow-guard.sh only catches a typo at dispatch
+  // time; catch it here, at the commit, by checking every argument against agents/.
+  const names = [...new Set([...src.matchAll(/\brole\(\s*(['"])([^'"]*)\1/g)].map(m => m[2]))]
+  if (!names.length) ok(`workflows/${f}: no role() arguments to check`)
+  else {
+    const missing = names.filter(n => !roster.includes(n))
+    if (missing.length) bad(`workflows/${f}: role() names no such agent: ${missing.join(', ')} (roster: ${roster.join(', ')})`)
+    else ok(`workflows/${f}: all ${names.length} role() argument(s) are roster agents`)
+  }
 }
 process.exit(fail)
 JS
