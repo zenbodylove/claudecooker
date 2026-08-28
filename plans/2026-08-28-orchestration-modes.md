@@ -12,6 +12,15 @@
 
 ---
 
+> **Amended 2026-08-28, after this plan was executed:** in `chill`, `planner`, `debugger` and
+> `branch-reviewer` were dropped from Opus·high to Opus·medium, adding the twins `planner-medium`,
+> `debugger-medium` and `branch-reviewer-medium` — nine twins now, not six. This plan is kept as the
+> build record of the original modes branch and its tables are *not* updated; `modes.json` and
+> `CLAUDE.md` §Modes are the live source of truth. See the amendment in
+> `specs/2026-08-28-orchestration-modes-design.md`.
+
+---
+
 ## Global constraints
 
 Carry these into every task. A task that breaks one is not done.
