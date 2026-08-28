@@ -1,5 +1,7 @@
 # Orchestration Modes — Design
 
+> Published as [Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d).
+
 **Date:** 2026-08-28 · **Owner:** Tim · **Scope:** user-level (`~/.claude/`), applies to every repo on this machine
 **Builds on:** `specs/2026-08-25-subagent-dispatch-policy-design.md`
 

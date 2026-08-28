@@ -59,6 +59,8 @@ The main session is the **orchestrator** (Fable · medium). It designs, briefs, 
 
 Modes vary the roster and the workflow fan-out with how much budget is left. The names are the interface: **cook** your Claude when the budget is open and the work is hard, **flow** for the everyday middle, **chill** when you are nearing the end of a session or weekly window and want the week to survive. The active mode is one word in `~/.claude/.mode` — `cook` | `flow` | `chill`. Absent, empty or unrecognised means `cook`, so a machine that has never heard of modes behaves exactly as it always did. Set it with `/mode flow`, `/mode chill`, `/mode cook`; `/mode` alone reports it.
 
+[Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d) walks through the design in one page: the two levers, the tier table cell by cell, and why the guards only warn.
+
 | Role | cook | flow | chill |
 |---|---|---|---|
 | `scout` | Haiku · medium | Haiku · medium | Haiku · medium |
