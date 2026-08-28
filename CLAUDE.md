@@ -23,36 +23,20 @@ git config core.hooksPath hooks   # once per clone: run-tests.sh becomes the pre
 
 There is no build, no package manager, no lint. Dependencies are `bash`, `jq` and `node`. Workflow scripts cannot be checked with `node --check` (they use `export const meta`, top-level `await` and top-level `return`); `run-tests.sh` constructs an `AsyncFunction` from the source instead.
 
-## Architecture
+## Working in this repo
 
-Four layers, deliberately separated (see `specs/2026-08-25-subagent-dispatch-policy-design.md` for the reasoning and `plans/2026-08-25-subagent-dispatch-policy.md` for how it was built):
+See `README.md` for the architecture — the four layers, the roster, how the guards and tests fit
+together, and how to add a role or a mode. Four rules bind any change made here:
 
-| Layer | Lives at | Owns |
-|---|---|---|
-| 0 Policy | `CLAUDE.md` §Dispatch rules | tier table, hard rules |
-| 1 Roles | `agents/*.md` | model, effort, tools, prompt, return contract per role |
-| 2 Saved workflows | `workflows/*.js` | repeatable fan-out/verify shapes |
-| 3 Guards | `hooks/*.sh` + `settings.json` | warn-only enforcement of layers 0–1 |
-| 4 Modes | `modes.json` + `.mode` + `agents/*-<tier>.md` | which roster tier and fan-out the budget affords |
-
-The load-bearing idea: **the model/effort decision is made once, in a role file, never per dispatch.** A subagent dispatched without a role inherits the session model (Fable) at session effort — the most expensive model for the least deliberate work. Roles pin it; guards notice when a dispatch skips them.
-
-**Role files** (`agents/<role>.md`) are frontmatter (`name`, `description` with trigger phrasing, `model`, `effort`, `tools`, `maxTurns`) plus a body of exactly three parts: procedure, **return contract** (JSON, naming its canonical schema), and a **stop list** of what the role must not do. Roles are repo-agnostic — never put a project path in one. Adding a file to `agents/` extends the roster automatically: both guards derive the roster from `agents/*.md` basenames that contain a `name:` line, so no hook edit is needed.
-
-**Guards are warn-only by design.** `hooks/dispatch-guard.sh` (PreToolUse/`Agent`) and `hooks/workflow-guard.sh` (PreToolUse/`Workflow`) always `exit 0` and fail open on any parse error; they emit `hookSpecificOutput.additionalContext` naming the roster. Never convert one to `permissionDecision: deny`. The workflow guard parses script text heuristically — it masks `(` inside strings and comments with `\001` so prose containing "agent(" is not read as a call — and also resolves `scriptPath` and saved-workflow `name` before scanning.
-
-**Schema duplication is intentional and tested.** Canonical return schemas live in `schemas/*.json` (draft-07, with `title`, `type: object`, `required`, `properties`). Workflow scripts must inline a copy, because the script has no filesystem access at authoring time. Each inline copy carries the exact marker line above it:
-
-```js
-// canonical: schemas/reviewer-findings.json — keep in sync (hooks/test-schemas.sh)
-const FINDINGS = {
-```
-
-`hooks/test-schemas.sh` evaluates every inline literal and deep-compares it (ignoring `$schema`/`title`) against the file the marker names. The parser is line-based: the literal must start at `const NAME = {` at column 0 and end at `}` at column 0. Change a schema in one place and the test fails until the other is updated.
-
-**Workflow conventions:** every `agent()` call sets `agentType` to a roster role and a `schema`; never a bare `model`. Prefer `pipeline()` over `parallel()` unless a real barrier is needed (`review-branch` uses a barrier only to dedup findings across dimensions before the skeptic stage). `meta` must be a pure literal with `phases` titles matching the `phase()` calls.
-
-**Tier twins are full copies and tested for drift.** A mode substitutes a role for a twin named by tier, not by mode (`reviewer-sonnet`, not `reviewer-chill`), because flow and chill share four of their five substitutions. Agent frontmatter cannot inherit, so each twin is a byte-identical copy of its parent's body with `name`, `description`, `model` and `effort` changed — and `hooks/test-modes.sh` asserts exactly that, so editing a parent's stop list and forgetting the twin fails the pre-commit hook. The same test asserts every (role, mode) cell of the tier table and deep-compares each workflow's inline `SUBS` constant against `modes.json`, the way `hooks/test-schemas.sh` does for inline schemas. `.mode` is untracked: it is machine state, and the two checkouts must not disagree about it.
+- **Guards never block.** `hooks/*-guard.sh` always `exit 0`, never emit `permissionDecision`, and fail
+  open on every error path. Warn-only is a design decision, not an oversight.
+- **Duplication is deliberate and tested.** Workflow scripts inline copies of `schemas/*.json` and of
+  `modes.json` because a running script has no filesystem access; each copy carries a
+  `// canonical: <path> — keep in sync (hooks/test-<x>.sh)` marker and is deep-compared by that test.
+  Agent twins are full copies of their parents for the same reason. Change one side and the suite fails
+  until you change the other.
+- **Roles are repo-agnostic.** Never put a project path in an `agents/*.md` file.
+- **`.mode` is machine state.** Untracked, deliberately — the two checkouts must not disagree about it.
 
 # Global rules (all repos)
 
