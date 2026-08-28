@@ -25,7 +25,7 @@ There is no build, no package manager, no lint. Dependencies are `bash`, `jq` an
 
 ## Working in this repo
 
-See `README.md` for the architecture — the four layers, the roster, how the guards and tests fit
+See `~/.claude/README.md` (or `~/claude/README.md` in the working checkout) for the architecture — the four layers, the roster, how the guards and tests fit
 together, and how to add a role or a mode. Four rules bind any change made here:
 
 - **Guards never block.** `hooks/*-guard.sh` always `exit 0`, never emit `permissionDecision`, and fail
