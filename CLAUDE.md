@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-This repo **is** Claude Code's user config directory. It has two checkouts of the same remote (`zenbodylove/claude`):
+This repo **is** Claude Code's user config directory. It has two checkouts of the same remote (`zenbodylove/claudecooker`):
 
 - `~/.claude/` — the **live** config. Claude Code reads roles, hooks, workflows and this file from here. Changes only take effect once they land here.
 - `~/claude/` — a working checkout for editing the config as a codebase.
