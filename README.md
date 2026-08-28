@@ -1,9 +1,11 @@
-# claudecooker — a versioned Claude Code config
+# claudecooker
 
-This repository **is** Claude Code's user config directory. It holds the policy that decides which
-model does which piece of work: role definitions for subagents, saved multi-agent workflows, the
-warn-only hooks that notice when a dispatch skips them, and a test suite that keeps the whole thing
-honest.
+**Cook or chill, or stay in the flow. You choose how hard to run your Claudes.**
+
+A versioned Claude Code config. This repository **is** Claude Code's user config directory. It holds the
+policy that decides which model does which piece of work: role definitions for subagents, saved multi-agent
+workflows, the warn-only hooks that notice when a dispatch skips them, and a test suite that keeps the whole
+thing honest.
 
 There is no build and no package manager. The dependencies are `bash`, `jq` and `node`.
 
@@ -91,6 +93,8 @@ Alongside these nine there are six **tier twins** — `implementer-medium`, `rev
 its parent at a cheaper tier, and modes are what select them.
 
 ## Modes: cook, flow, chill
+
+*Cook or chill, or stay in the flow. You choose how hard to run your Claudes.*
 
 > **[Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d)** — an illustrated walk through the modes design: the two levers, the tier
 > table cell by cell, and why the guards only warn.
