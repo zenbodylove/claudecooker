@@ -128,4 +128,126 @@ while read -r parent twin; do
     || bad "twin $twin: description is identical to $parent's"
 done < <(jq -r '[.modes[].roles | to_entries[] | "\(.key) \(.value)"] | unique[]' "$MODES" 2>/dev/null)
 
+
+# ---------------------------------------------------------------------------
+# 3. hooks/mode-context.sh — SessionStart mode announcement
+# ---------------------------------------------------------------------------
+HOOK="$ROOT/hooks/mode-context.sh"
+if [[ ! -x $HOOK ]]; then
+  bad "mode-context.sh: not found or not executable at $HOOK"
+else
+  ok "mode-context.sh: exists and is executable"
+
+  # Drive the hook against a throwaway CLAUDE_CONFIG_DIR. $1 = .mode contents
+  # ("__absent__" writes no .mode at all); $2 = good|bad|none for modes.json.
+  # Sets mc_out and mc_status; never uses a subshell, so both survive.
+  mc_run() {
+    local dot="$1" modes_state="${2:-good}" tmp
+    tmp=$(mktemp -d)
+    case "$modes_state" in
+      good) cp "$MODES" "$tmp/modes.json" ;;
+      bad)  printf 'not json\n' > "$tmp/modes.json" ;;
+      none) : ;;
+    esac
+    [[ $dot == "__absent__" ]] || printf '%s' "$dot" > "$tmp/.mode"
+    mc_out=$(CLAUDE_CONFIG_DIR="$tmp" bash "$HOOK" </dev/null 2>/dev/null)
+    mc_status=$?
+    rm -rf "$tmp"
+  }
+
+  # 3a. silent cases: exit 0, no stdout at all (cook must cost no context)
+  #   case                         .mode        modes.json
+  while read -r case dot modes_state; do
+    [[ -n ${case:-} ]] || continue
+    [[ $dot == "__empty__" ]] && dot=""
+    mc_run "$dot" "$modes_state"
+    if [[ $mc_status -ne 0 ]]; then
+      bad "$case: exit $mc_status, expected 0"
+    elif [[ -n $mc_out ]]; then
+      bad "$case: expected no stdout, got: $mc_out"
+    else
+      ok "$case: silent, exit 0"
+    fi
+  done <<'SILENT'
+mode-context-absent          __absent__ good
+mode-context-empty           __empty__  good
+mode-context-cook            cook       good
+mode-context-garbage         banana     good
+mode-context-no-modes-json   chill      none
+mode-context-bad-modes-json  chill      bad
+SILENT
+
+  # 3b. speaking cases: additionalContext naming the mode, its subs and its fan-out
+  #   case                       .mode   required substrings
+  while read -r case dot want; do
+    [[ -n ${case:-} ]] || continue
+    mc_run "$dot" good
+    if [[ $mc_status -ne 0 ]]; then
+      bad "$case: exit $mc_status, expected 0"; continue
+    fi
+    if ! ctx=$(jq -re '.hookSpecificOutput.additionalContext' <<<"$mc_out" 2>/dev/null); then
+      bad "$case: no .hookSpecificOutput.additionalContext in: $mc_out"; continue
+    fi
+    miss=""
+    for w in $want; do [[ $ctx == *"$w"* ]] || miss="$miss $w"; done
+    [[ -z $miss ]] && ok "$case: announces ${want// /, }" \
+      || bad "$case: additionalContext missing:$miss — got: $ctx"
+  done <<'SPEAK'
+mode-context-flow   flow  flow implementer-medium reviewer-medium skeptic-sonnet docs-writer-sonnet branch-reviewer-high full
+mode-context-chill  chill chill implementer-medium reviewer-sonnet skeptic-sonnet docs-writer-sonnet branch-reviewer-high capped
+SPEAK
+
+  # 3c. a trailing newline in .mode must not change a thing
+  mc_run 'chill' good; bare="$mc_out"
+  mc_run 'chill
+' good
+  [[ $mc_status -eq 0 && $mc_out == "$bare" && -n $bare ]] \
+    && ok "mode-context-trailing-newline: output identical to bare 'chill'" \
+    || bad "mode-context-trailing-newline: got '$mc_out', expected '$bare'"
+
+  # 3d. hookEventName
+  mc_run 'chill' good
+  [[ $(jq -r '.hookSpecificOutput.hookEventName // empty' <<<"$mc_out" 2>/dev/null) == SessionStart ]] \
+    && ok "mode-context-event-name: hookEventName == SessionStart" \
+    || bad "mode-context-event-name: hookEventName is not SessionStart — got: $mc_out"
+
+  # 3e. warn-only contract: no permissionDecision key, ever
+  for dot in flow chill cook banana; do
+    mc_run "$dot" good
+    if [[ -z $mc_out ]]; then
+      ok "mode-context-no-permission-decision/$dot: no output at all"
+    elif [[ $(jq -r '[paths | .[-1]] | map(select(. == "permissionDecision")) | length' <<<"$mc_out" 2>/dev/null) == 0 ]]; then
+      ok "mode-context-no-permission-decision/$dot: warn-only, no permissionDecision key"
+    else
+      bad "mode-context-no-permission-decision/$dot: emitted a permissionDecision — got: $mc_out"
+    fi
+  done
+  grep -q 'permissionDecision' "$HOOK" \
+    && bad "mode-context.sh: source mentions permissionDecision" \
+    || ok "mode-context.sh: source never mentions permissionDecision"
+fi
+
+# ---------------------------------------------------------------------------
+# 3f. settings.json registers mode-context.sh on SessionStart
+# ---------------------------------------------------------------------------
+SETTINGS="$ROOT/settings.json"
+if ! jq -e . "$SETTINGS" >/dev/null 2>&1; then
+  bad "settings.json: not valid JSON"
+else
+  ok "settings.json parses"
+  cmd=$(jq -r '.hooks.SessionStart[0].hooks[0].command // empty' "$SETTINGS")
+  [[ $cmd == '$HOME/.claude/hooks/mode-context.sh' ]] \
+    && ok "settings.json: SessionStart runs mode-context.sh" \
+    || bad "settings.json: SessionStart command is '$cmd', expected \$HOME/.claude/hooks/mode-context.sh"
+  [[ $(jq -r '.hooks.SessionStart[0].hooks[0].timeout // empty' "$SETTINGS") =~ ^[0-9]+$ ]] \
+    && ok "settings.json: SessionStart hook has a numeric timeout" \
+    || bad "settings.json: SessionStart hook has no numeric timeout"
+  [[ $(jq -r '.hooks.SessionStart[0].matcher // "none"' "$SETTINGS") == none ]] \
+    && ok "settings.json: SessionStart has no matcher (fires on start/resume/clear/compact)" \
+    || bad "settings.json: SessionStart should have no matcher"
+  [[ $(jq -r '[.hooks.PreToolUse[].matcher] | sort | join(",")' "$SETTINGS") == "Agent,Workflow" ]] \
+    && ok "settings.json: PreToolUse Agent+Workflow hooks intact" \
+    || bad "settings.json: PreToolUse hooks disturbed"
+fi
+
 exit $fail
