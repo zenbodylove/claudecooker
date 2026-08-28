@@ -1,4 +1,4 @@
-# claude — a versioned Claude Code config
+# claudecooker — a versioned Claude Code config
 
 This repository **is** Claude Code's user config directory. It holds the policy that decides which
 model does which piece of work: role definitions for subagents, saved multi-agent workflows, the
@@ -9,7 +9,7 @@ There is no build and no package manager. The dependencies are `bash`, `jq` and 
 
 ## Two checkouts, and why it matters
 
-The same remote is checked out twice:
+The same remote (`zenbodylove/claudecooker`) is checked out twice:
 
 | Path | Role |
 |---|---|
@@ -91,6 +91,9 @@ Alongside these nine there are six **tier twins** — `implementer-medium`, `rev
 its parent at a cheaper tier, and modes are what select them.
 
 ## Modes: cook, flow, chill
+
+> **[Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d)** — an illustrated walk through the modes design: the two levers, the tier
+> table cell by cell, and why the guards only warn.
 
 Seven of the nine roles are Opus, so the framework as built spends its scarcest resource on nearly every
 dispatch. A mode says how much of that you can currently afford. Set one word in `~/.claude/.mode` and the
@@ -261,4 +264,5 @@ real.
   was deliberately left out.
 - `specs/2026-08-28-orchestration-modes-design.md` — the modes design: the tier table and the reasoning
   behind every cell.
+- [Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d) — the modes design and concept as a single page.
 - `plans/` — the task-by-task plans these were built from.
