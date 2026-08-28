@@ -100,11 +100,17 @@ for (const r of reviews.filter(Boolean)) {
     all.push({ ...f, dimension: r.dimension })
   }
 }
-log(`${all.length} unique findings across ${reviews.filter(Boolean).length} dimensions`)
-if (!all.length) return { confirmed: [], refuted: [], uncertain: [], dimensions_run: DIMENSIONS.map(d => d.key) }
+const capped = fanout === 'capped'
+const toVerify = capped ? all.filter(f => f.severity !== 'minor') : all
+const unverified = capped ? all.filter(f => f.severity === 'minor') : []
+log(`${all.length} unique findings across ${reviews.filter(Boolean).length} dimensions` +
+  (capped ? ` — verifying ${toVerify.length}, returning ${unverified.length} minor finding(s) unverified` : ''))
+const baseOut = () => ({ confirmed: [], refuted: [], uncertain: [], dimensions_run: DIMENSIONS.map(d => d.key) })
+if (!all.length) return { ...baseOut(), unverified: [], mode }
+if (!toVerify.length) return { ...baseOut(), unverified, mode }
 
 phase('Verify')
-const verified = await pipeline(all, f =>
+const verified = await pipeline(toVerify, f =>
   agent(
     `Claim to test: ${f.claim}\nLocation: ${f.file}:${f.line}\nEvidence offered: ${f.evidence}\n` +
       `The diff under review is \`git diff ${base}...HEAD\`. Try to refute this claim. Return the verdict shape.`,
@@ -112,7 +118,7 @@ const verified = await pipeline(all, f =>
   ).then(v => ({ ...f, verdict: v })),
 )
 
-const out = { confirmed: [], refuted: [], uncertain: [], dimensions_run: DIMENSIONS.map(d => d.key) }
+const out = { ...baseOut(), unverified, mode }
 for (const r of verified.filter(Boolean)) {
   const v = r.verdict
   if (!v) out.uncertain.push(r)

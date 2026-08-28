@@ -79,8 +79,10 @@ const sweeps = await parallel(angles.map((a, i) => () =>
 ))
 const byPath = new Map()
 for (const s of sweeps.filter(Boolean)) for (const m of s.matches || []) if (!byPath.has(m.path)) byPath.set(m.path, m)
-const unique = [...byPath.values()].slice(0, 20)
-log(`${unique.length} unique locations from ${angles.length} angles${byPath.size > 20 ? ` (capped from ${byPath.size})` : ''}`)
+const readCap = fanout === 'capped' ? 4 : 20
+const unique = [...byPath.values()].slice(0, readCap)
+const skipped = byPath.size - unique.length
+log(`${unique.length} unique locations from ${angles.length} angles${skipped ? ` (capped at ${readCap}, ${skipped} skipped)` : ''}`)
 
 phase('Read')
 const reads = await pipeline(unique, m =>
@@ -95,4 +97,4 @@ const map = await agent(
     `Produce one structured answer: the answer in plain prose, the locations with each file's role, and open questions you could not settle from these summaries.`,
   { agentType: role('reviewer'), label: 'synthesise', phase: 'Synthesise', schema: MAP },
 )
-return map
+return map && typeof map === 'object' ? { ...map, skipped } : map
