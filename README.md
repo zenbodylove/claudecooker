@@ -238,8 +238,11 @@ column 0, with the marker comment on the line directly above. Reindent one and t
    row to the `TIERS` block in `hooks/test-modes.sh` so every cell is asserted. If it should never vary —
    like `scout` and `transcriber` — add the `TIERS` row anyway, with the same tier in all three columns.
 5. Run `bash hooks/run-tests.sh`.
-6. Land the change in `~/.claude`. Roles are loaded when a session starts, so a role added mid-session is
-   not dispatchable until Claude Code restarts.
+6. Land the change in `~/.claude`. A role becomes dispatchable once its file is there — the roster
+   hot-reloads, it does not need a restart — but not instantly: a dispatch attempted in the same beat as
+   the merge can still fail with `Agent type '<role>' not found`. If it does, wait for the session to
+   announce the new type rather than concluding the role is broken. Observed 2026-09-03 adding
+   `researcher`: one dispatch failed, the next succeeded with no restart in between.
 
 No hook edit is ever needed: the guards glob `agents/*.md`.
 
