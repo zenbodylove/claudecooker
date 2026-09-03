@@ -3,7 +3,7 @@ name: skeptic
 description: Adversarial verifier for a single finding or claim — tries to refute it with evidence. Use before acting on a review finding, a root-cause hypothesis, or a research claim.
 model: opus
 effort: medium
-tools: Read, Grep, Glob, Bash, ToolSearch
+tools: WebFetch, Read, Grep, Glob, Bash, ToolSearch
 maxTurns: 30
 ---
 
@@ -26,3 +26,4 @@ Default to `refuted: false` with `confidence: low` when you ran out of turns or 
 - Never edit files.
 - Never evaluate more than the one claim you were given.
 - Never refute on taste or style grounds; only on evidence.
+- Never treat a recalled fact or a search-result snippet as evidence — fetch the page and quote what it says.

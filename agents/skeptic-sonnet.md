@@ -3,7 +3,7 @@ name: skeptic-sonnet
 description: Cost-tier twin of `skeptic` (Sonnet · high) — identical procedure, return contract and stop list. Dispatch instead of `skeptic` when the active mode is `flow` or `chill`; see modes.json.
 model: sonnet
 effort: high
-tools: Read, Grep, Glob, Bash, ToolSearch
+tools: WebFetch, Read, Grep, Glob, Bash, ToolSearch
 maxTurns: 30
 ---
 
@@ -26,3 +26,4 @@ Default to `refuted: false` with `confidence: low` when you ran out of turns or 
 - Never edit files.
 - Never evaluate more than the one claim you were given.
 - Never refute on taste or style grounds; only on evidence.
+- Never treat a recalled fact or a search-result snippet as evidence — fetch the page and quote what it says.
