@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "researcher-findings",
+  "type": "object",
+  "required": ["question", "findings", "unverified"],
+  "properties": {
+    "question": { "type": "string" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "url", "quote", "fetched_at"],
+        "properties": {
+          "claim": { "type": "string" },
+          "url": { "type": "string" },
+          "quote": { "type": "string" },
+          "fetched_at": { "type": "string" },
+          "confidence": { "type": "string", "enum": ["high", "medium", "low"] }
+        }
+      }
+    },
+    "unverified": { "type": "array", "items": { "type": "string" } },
+    "sources_blocked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "reason"],
+        "properties": {
+          "url": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    }
+  }
+}

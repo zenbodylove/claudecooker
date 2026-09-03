@@ -84,13 +84,14 @@ access, so anything they need to know arrives in `args`.
 | `skeptic` | Opus · medium | Adversarial check of one finding: try to refute it with evidence. |
 | `docs-writer` | Opus · medium | Docs prose to a style supplied in the brief, never hard-coded. |
 | `branch-reviewer` | Opus · xhigh | Whole-branch review once, before merge. |
+| `researcher` | Opus · medium | Open-web research: fetches its sources and quotes them. The only role with `WebSearch`/`WebFetch`. |
 
 Adding a file to `agents/` extends the roster automatically: both guards derive it from the basenames of
 `agents/*.md` that contain a `name:` line, so no hook needs editing.
 
-Alongside these nine there are nine **tier twins** — `implementer-medium`, `reviewer-medium`,
+Alongside these ten there are ten **tier twins** — `implementer-medium`, `reviewer-medium`,
 `reviewer-sonnet`, `skeptic-sonnet`, `docs-writer-sonnet`, `planner-medium`, `debugger-medium`,
-`branch-reviewer-high`, `branch-reviewer-medium`. Each is a full copy of its parent at a cheaper tier, and
+`branch-reviewer-high`, `branch-reviewer-medium`, `researcher-sonnet`. Each is a full copy of its parent at a cheaper tier, and
 modes are what select them.
 
 ## Modes: cook, flow, chill
@@ -100,7 +101,7 @@ modes are what select them.
 > **[Cook, Flow, Chill](https://claude.ai/code/artifact/66b4fc8e-b21b-4e01-97d2-b50bc36d6e0d)** — an illustrated walk through the modes design: the two levers, the tier
 > table cell by cell, and why the guards only warn.
 
-Seven of the nine roles are Opus, so the framework as built spends its scarcest resource on nearly every
+Eight of the ten roles are Opus, so the framework as built spends its scarcest resource on nearly every
 dispatch. A mode says how much of that you can currently afford. Set one word in `~/.claude/.mode` and the
 roster shifts under you.
 
@@ -137,11 +138,13 @@ Two levers, and they are worth understanding separately:
 | `reviewer` | Opus · high | Opus · medium | Sonnet · high |
 | `skeptic` | Opus · medium | Sonnet · high | Sonnet · high |
 | `docs-writer` | Opus · medium | Sonnet · medium | Sonnet · medium |
+| `researcher` | Opus · medium | Opus · medium | Sonnet · medium |
 | `branch-reviewer` | Opus · xhigh | Opus · high | Opus · medium |
 | *workflow fan-out* | full | full | capped |
 
-`planner` and `debugger` hold their full tier through `flow`: a bad plan costs more rework than the saving,
-and a debugger is dispatched only when something is already wrong. They give it up in `chill`, where the
+`planner`, `debugger` and `researcher` hold their full tier through `flow`: a bad plan costs more rework
+than the saving, a debugger is dispatched only when something is already wrong, and a fabricated or
+unchecked research finding is paid for in every decision built on it. They give it up in `chill`, where the
 point is to survive the window and no dispatch is exempt from that. Only `scout` and `transcriber` never
 vary — they are Haiku already. `implementer` goes the other way in `cook` — Opus · high, because its
 mistakes cost an Opus review round plus an Opus fix round.

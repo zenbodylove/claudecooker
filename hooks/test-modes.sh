@@ -81,6 +81,7 @@ implementer      opus:high      opus:medium     opus:medium
 reviewer         opus:high      opus:medium     sonnet:high
 skeptic          opus:medium    sonnet:high     sonnet:high
 docs-writer      opus:medium    sonnet:medium   sonnet:medium
+researcher       opus:medium    opus:medium     sonnet:medium
 branch-reviewer  opus:xhigh     opus:high       opus:medium'
 
 while read -r role c f ch; do

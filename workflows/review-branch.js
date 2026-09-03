@@ -33,6 +33,7 @@ const SUBS = {
       'docs-writer': 'docs-writer-sonnet',
       planner: 'planner-medium',
       debugger: 'debugger-medium',
+      researcher: 'researcher-sonnet',
       'branch-reviewer': 'branch-reviewer-medium',
     },
     fanout: 'capped',
