@@ -206,6 +206,7 @@ catches syntax errors without executing anything.
 | `hooks/test-schemas.sh` | Every `schemas/*.json` is valid, and every inline schema copy in a workflow still deep-matches it. |
 | `hooks/test-modes.sh` | `modes.json`'s structure, every cell of the tier table, twin fidelity, `mode-context.sh`'s behaviour, and the inline `SUBS` copies. |
 | `hooks/test-workflows.sh` | Executes each workflow against stubbed `agent`/`parallel`/`pipeline`, asserting which `agentType`s were dispatched and that the `chill` cap actually caps. |
+| `hooks/test-frontmatter.sh` | Every `agents/*.md` has one well-formed frontmatter block, no unquoted colon-space, ` #` or leading YAML indicator, no tabs, and `name` matching its basename. Strict-parses with PyYAML when it is installed, and skips visibly when it is not. |
 
 Two of those are **deliberate-duplication checks**, and they are the reason this repo tolerates copied
 data at all:
