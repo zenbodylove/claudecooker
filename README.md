@@ -84,7 +84,7 @@ access, so anything they need to know arrives in `args`.
 | `skeptic` | Opus · medium | Adversarial check of one finding: try to refute it with evidence. Has `WebFetch` for claims about live pages. |
 | `docs-writer` | Opus · medium | Docs prose to a style supplied in the brief, never hard-coded. |
 | `branch-reviewer` | Opus · xhigh | Whole-branch review once, before merge. |
-| `researcher` | Opus · medium | Open-web research: fetches its sources and quotes them. The only role with `WebSearch`. |
+| `researcher` | Opus · medium | Open-web research: fetches its sources and quotes them. The only role with `WebSearch`. Writes only the output and report paths its brief names. |
 
 Adding a file to `agents/` extends the roster automatically: both guards derive it from the basenames of
 `agents/*.md` that contain a `name:` line, so no hook needs editing.
